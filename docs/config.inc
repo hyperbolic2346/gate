@@ -6,7 +6,7 @@ $sql_user = "motion";
 $sql_pass = "password";
 $sql_db = "motion";
 
-// path to the files saved by motion(assumed mapped to /media)
-$base_path = "/fileserv/security_camera";
+// base file path to files dumped by motion(assumed to be mapped to /media on web server)
+$base_path = "/path/to/motion/output";
 
 ?>
