@@ -1,14 +1,15 @@
 <?php
 
 // put full path to Smarty.class.php
-require('/srv/gate/lib/Smarty/Smarty.class.php');
+//echo realpath(dirname(__FILE__).'/../lib/Smarty/Smarty.class.php');
+require(realpath(dirname(__FILE__).'/../lib/Smarty/Smarty.class.php'));
 include('config.inc');
 $smarty = new Smarty();
 
-$smarty->setTemplateDir('/srv/gate//smarty/templates');
-$smarty->setCompileDir('/srv/gate/smarty/templates_c');
-$smarty->setCacheDir('/srv/gate/smarty/cache');
-$smarty->setConfigDir('/srv/gate/smarty/configs');
+$smarty->setTemplateDir(realpath(dirname(__FILE__).'/../smarty/templates'));
+$smarty->setCompileDir(realpath(dirname(__FILE__).'/../smarty/templates_c'));
+$smarty->setCacheDir(realpath(dirname(__FILE__).'/../smarty/cache'));
+$smarty->setConfigDir(realpath(dirname(__FILE__).'/../smarty/configs'));
 
 session_start();
 
@@ -17,7 +18,6 @@ $mysqli = NULL;
 if (isset($_REQUEST['login_name'])) {
 	// connect to database
 	$mysqli = new mysqli($sql_host, $sql_user, $sql_pass, $sql_db);
-//	echo md5($_REQUEST['login_pw'])."<br />";
 	$result = $mysqli->query("SELECT * from users WHERE username = '".$_REQUEST['login_name']."' AND password = '". md5($_REQUEST['login_pw']). "'");
 	if ($result && $row = $result->fetch_assoc()) {
 		$_SESSION['user'] = $row;
@@ -96,8 +96,6 @@ if (!isset($mysqli)) {
 if (isset($_SESSION['user']) && $_SESSION['user']['access_level'] === '0') {
 	$smarty->assign('cur', $_SERVER['PHP_SELF'].'?view_date='.$date);
 }
-$smarty->assign('next', $_SERVER['PHP_SELF'].'?view_date='.date('Ymd', $view_date+86400));
-$smarty->assign('prev', $_SERVER['PHP_SELF'].'?view_date='.date('Ymd', $view_date-86400));
 
 $query = 'SELECT TIME(event_time_stamp) as timefield, '. //HOUR(event_time_stamp) as hourfield, '.
                 'event_time_stamp+0 as time_stamp, file_size, camera, filename, file_type '.
@@ -116,7 +114,6 @@ while ($result && $row = $result->fetch_assoc()) {
 	if ($row['file_type'] == 8) {
 		// found a movie
 		$camera_data[$row['time_stamp']]['movie'] = str_replace($base_path, '/media', $parts[0]);
-//		$camera_data[$row['time_stamp']]['file_size'] = $row['file_size'];
 		$camera_data[$row['time_stamp']]['camera'] = $row['camera'];
 		$camera_data[$row['time_stamp']]['pretty_time'] = date('g:i:s a', strtotime($row['timefield']));
 		if (!isset($camera_data[$row['time_stamp']])) {
@@ -124,7 +121,7 @@ while ($result && $row = $result->fetch_assoc()) {
 		}
 	} else if ($row['file_type'] == 1) {
 		// jpeg
-		$camera_data[$row['time_stamp']]['thumbnail'] = str_replace($base_path, '/media', $parts[0]); //$row['filename']);
+		$camera_data[$row['time_stamp']]['thumbnail'] = str_replace($base_path, '/media', $parts[0]);
 	}
 }
 

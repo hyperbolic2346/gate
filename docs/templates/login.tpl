@@ -4,7 +4,7 @@
 <div id='info_box'>{$info}</div>
 {/if}
 
-<form action='http://gate.burntsheep.com/index.php' method='post'>
+<form action='index.php' method='post'>
 
 <div id='login_box'>
   <div id='login_name_label'>Name</div>
