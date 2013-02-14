@@ -116,7 +116,7 @@ while ($result && $row = $result->fetch_assoc()) {
 		$camera_data[$row['time_stamp']]['camera'] = $row['camera'];
 		$camera_data[$row['time_stamp']]['pretty_time'] = date('g:i:s a', strtotime($row['timefield']));
 		if (!isset($camera_data[$row['time_stamp']]['thumbnail'])) {
-			$camera_data[$row['time_stamp']]['thumbnail'] = "/media/static.jpg";
+			$camera_data[$row['time_stamp']]['thumbnail'] = "/media/static";
 		}
 	} else if ($row['file_type'] == 1) {
 		// jpeg
