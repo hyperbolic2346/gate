@@ -109,14 +109,13 @@ $result = $mysqli->query($query) or die("Unable to query database - $query");
 $smarty->assign('day', date('l, F jS Y', $view_date));
 
 while ($result && $row = $result->fetch_assoc()) {
-	$file_parts = split_filename($row['filename']);
 	$parts = split_filename($row['filename']);
 	if ($row['file_type'] == 8) {
 		// found a movie
 		$camera_data[$row['time_stamp']]['movie'] = str_replace($base_path, '/media', $parts[0]);
 		$camera_data[$row['time_stamp']]['camera'] = $row['camera'];
 		$camera_data[$row['time_stamp']]['pretty_time'] = date('g:i:s a', strtotime($row['timefield']));
-		if (!isset($camera_data[$row['time_stamp']])) {
+		if (!isset($camera_data[$row['time_stamp']]['thumbnail'])) {
 			$camera_data[$row['time_stamp']]['thumbnail'] = "/media/static.jpg";
 		}
 	} else if ($row['file_type'] == 1) {
