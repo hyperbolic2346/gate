@@ -9,14 +9,7 @@
 
 {if isset($camera_data)}
 <script type="text/javascript" src="/lib/html5lightbox/html5lightbox.js"></script>
-<script type="text/javascript">
-function delete_entry(item, event_time) {
-	$(item).parent().remove();
-//	$('#info').html('gone!');
-	$.post('/ajax_delete.php', { delete: event_time }, function (data) { $('#info').html(data); });
-//	$('<form action="{$cur}" method="post"><input type="hidden" name="delete" value="' + $event_time + '"></form>').appendTo('body').submit();
-}
-</script>
+<script type="text/javascript" src="/js/index.js"></script>
 {/if}
 
 <div id='day'>{$day}</div>
@@ -29,6 +22,16 @@ function delete_entry(item, event_time) {
 <div id='cal' class='camera_event'>
 {$calendar}
 </div>
+
+{if isset($live_cam)}
+<div class='camera_event'>
+	{if isset($cur)}
+	<div class='camera_delete'></div>
+	{/if}
+	<div class='camera_time'>Now</div>
+	<div class='camera_video'><img id='live_video' src='{$live_cam}' /></div>
+</div>
+{/if}
 
 {foreach $camera_data as $ev}
 	<div class='camera_event'>

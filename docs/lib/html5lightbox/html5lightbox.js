@@ -691,7 +691,7 @@ function loadHtml5LightBox(jsFolder) {
 					}
 					
 					inst.$elem.show();
-					inst.showData();						
+					inst.showData();
 				});
 			};
 			

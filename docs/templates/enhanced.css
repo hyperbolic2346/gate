@@ -16,8 +16,14 @@
 	float: left;
 }
 
+#live_video {
+	float: left;
+	width: 160px;
+}
+
 .camera_delete {
 	width: 25px;
+	height: 29px;
 	float: left;
 }
 

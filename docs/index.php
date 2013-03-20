@@ -96,6 +96,7 @@ if (!isset($mysqli)) {
 if (isset($_SESSION['user']) && $_SESSION['user']['access_level'] === '0') {
 	$smarty->assign('cur', $_SERVER['PHP_SELF'].'?view_date='.$date);
 }
+$smarty->assign('live_cam', 'http://10.0.1.14:9081/'); //$_SERVER['PHP_SELF'].'?view_date='.$date);
 
 $query = 'SELECT TIME(event_time_stamp) as timefield, '. //HOUR(event_time_stamp) as hourfield, '.
                 'event_time_stamp+0 as time_stamp, file_size, camera, filename, file_type '.
