@@ -8,6 +8,11 @@
 	margin-bottom: 25px;
 }
 
+#live_video {
+	float: left;
+	width: 80%;
+}
+
 .camera_event {
 	width: 100%;
 	float: left;
