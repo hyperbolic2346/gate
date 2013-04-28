@@ -5,7 +5,7 @@ function delete_entry(item, event_time) {
 
 function expand() {
 	width = $(document).width();
-	height = $(document).height();
+	height = $(window).height();
 
 	imgwidth = 640;
 	imgheight = 480;

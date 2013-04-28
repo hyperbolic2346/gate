@@ -16,7 +16,6 @@
 
 <div id='info'>{$info}</div>
 
-{if isset($camera_data)}
 <div id='camera_events'>
 
 <div id='cal' class='camera_event'>
@@ -33,6 +32,7 @@
 </div>
 {/if}
 
+{if isset($camera_data)}
 {foreach $camera_data as $ev}
 	<div class='camera_event'>
 		{if isset($cur)}
@@ -48,9 +48,6 @@
 {/foreach}
 </div>
 {else}
-<div id='cal' class='camera_event'>
-{$calendar}
-</div>
 No events
 {/if}
 

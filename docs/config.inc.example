@@ -9,4 +9,7 @@ $sql_db = "motion";
 // base file path to files dumped by motion(assumed to be mapped to /media on web server)
 $base_path = "/path/to/motion/output";
 
+// url to live camera feed. If not available, comment out line
+$live_camera_url = 'http://'.$_SERVER['SERVER_NAME'].':9081/';
+
 ?>

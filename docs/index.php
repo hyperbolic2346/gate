@@ -1,7 +1,6 @@
 <?php
 
 // put full path to Smarty.class.php
-//echo realpath(dirname(__FILE__).'/../lib/Smarty/Smarty.class.php');
 require(realpath(dirname(__FILE__).'/../lib/Smarty/Smarty.class.php'));
 include('config.inc');
 $smarty = new Smarty();
@@ -96,14 +95,17 @@ if (!isset($mysqli)) {
 if (isset($_SESSION['user']) && $_SESSION['user']['access_level'] === '0') {
 	$smarty->assign('cur', $_SERVER['PHP_SELF'].'?view_date='.$date);
 }
-$smarty->assign('live_cam', 'http://10.0.1.14:9081/'); //$_SERVER['PHP_SELF'].'?view_date='.$date);
 
-$query = 'SELECT TIME(event_time_stamp) as timefield, '. //HOUR(event_time_stamp) as hourfield, '.
+if (isset($live_camera_url)) {
+	$smarty->assign('live_cam', $live_camera_url);
+}
+
+$query = 'SELECT TIME(event_time_stamp) as timefield, '. 
                 'event_time_stamp+0 as time_stamp, file_size, camera, filename, file_type '.
                 'FROM security '.
                 'WHERE event_time_stamp >= '.$date.'000000 '.
                 'AND event_time_stamp <= '.$date.'235959 '.
-                'ORDER BY timefield DESC, camera';// LIMIT '.$_REQUEST['start'].', 20';
+                'ORDER BY timefield DESC, camera';
 
 $result = $mysqli->query($query) or die("Unable to query database - $query");
 
