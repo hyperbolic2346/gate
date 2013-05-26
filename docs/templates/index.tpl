@@ -6,50 +6,51 @@
 <link rel="stylesheet" type="text/css" href="templates/enhanced.css" />
 <![endif]-->
 
-
-{if isset($camera_data)}
 <script type="text/javascript" src="/lib/html5lightbox/html5lightbox.js"></script>
 <script type="text/javascript" src="/js/index.js"></script>
-{/if}
 
+<div id='info'>{if isset($info)}{$info}{else}&nbsp;{/if}</div>
 <div id='day'>{$day}</div>
 
-<div id='info'>{$info}</div>
+{if isset($live_cam)}
+<div id='live_video_div'>
+	<div id='live_label'>Now</div>
+	<div id='live_video'><img id='live_video_img' src='{$live_cam}' /></div>
+</div>
 
-<div id='camera_events'>
+{if isset($access) && isset($access['control'])}
+<div id='gate_control_div'>
+</div>
+{/if}
+{/if}
 
-<div id='cal' class='camera_event'>
+<div id='calendar'>
 {$calendar}
 </div>
 
-{if isset($live_cam)}
-<div class='camera_event'>
-	{if isset($cur)}
-	<div class='camera_delete'></div>
-	{/if}
-	<div class='camera_time'>Now</div>
-	<div class='camera_video'><img id='live_video' src='{$live_cam}' /></div>
-</div>
+{if isset($live_cam) && isset($access['control'])}
+<br style="clear:both;"/>
 {/if}
 
+<div id='camera_events'>
 {if isset($camera_data)}
 {foreach $camera_data as $ev}
 	<div class='camera_event'>
-		{if isset($cur)}
+		{if isset($access['delete'])}
 		<div class='camera_delete' onClick='delete_entry(this, "{$ev@key}")'><img src='img/x.png' height="25" width="25" /></div>
 		{/if}
 		<div class='camera_time'>{$ev.pretty_time}</div>
 		<div class='camera_video'>
 			<div id='camera_video{$ev@index}'>
-				<a class="html5lightbox" href="{$ev.movie}.webm" data-ipad="{$ev.movie}.ipad.mp4" data-iphone="{$ev.movie}.ipad.mp4" data-width="640" data-height="480"><img src="{$ev.thumbnail}.thumb.jpg" width="100%" /></a>
+				<a class="html5lightbox" href="{$ev.movie}.webm" data-ipad="{$ev.movie}.ipad.mp4" data-iphone="{$ev.movie}.ipad.mp4" data-width="640" data-height="480"><img {if isset($ev.refresh)}class="refresh" {/if}data-refresh="{$ev.refresh_id}" src="{$ev.thumbnail}.thumb.jpg" width="100%" /></a>
 			</div>
 		</div>
 	</div>
 {/foreach}
-</div>
 {else}
 No events
 {/if}
+</div>
 
 {if isset($add_user)}
 	<form name="adduser" action="{$cur}" method="post"><input type="text" name="new_username" /><input type="password" name="new_pw" /><input type="submit" /></form>

@@ -3,6 +3,7 @@
 // put full path to Smarty.class.php
 require(realpath(dirname(__FILE__).'/../lib/Smarty/Smarty.class.php'));
 include('config.inc');
+include('lib/common.php');
 $smarty = new Smarty();
 
 $smarty->setTemplateDir(realpath(dirname(__FILE__).'/../smarty/templates'));
@@ -11,7 +12,7 @@ $smarty->setCacheDir(realpath(dirname(__FILE__).'/../smarty/cache'));
 $smarty->setConfigDir(realpath(dirname(__FILE__).'/../smarty/configs'));
 
 session_start();
-
+//unset($_SESSION['user']);
 $mysqli = NULL;
 
 if (isset($_REQUEST['login_name'])) {
@@ -20,6 +21,8 @@ if (isset($_REQUEST['login_name'])) {
 	$result = $mysqli->query("SELECT * from users WHERE username = '".$_REQUEST['login_name']."' AND password = '". md5($_REQUEST['login_pw']). "'");
 	if ($result && $row = $result->fetch_assoc()) {
 		$_SESSION['user'] = $row;
+		header('Location: '.$_SERVER['PHP_SELF']);
+		exit();
 	} else {
 		$smarty->assign('info', 'Unable to authorize.');
 	}
@@ -64,19 +67,6 @@ if (isset($_REQUEST['delete']) && isset($_SESSION['user']) && $_SESSION['user'][
 	$smarty->assign('info', 'Deleted.');
 }
 
-function split_filename($filename) 
-{ 
-    $pos = strrpos($filename, '.'); 
-    if ($pos === false) {
-        // dot is not found in the filename 
-        return array($filename, ''); // no extension 
-    } else {
-        $basename = substr($filename, 0, $pos); 
-        $extension = substr($filename, $pos+1); 
-        return array($basename, $extension); 
-    }
-}
-
 // if no day has been selected in the calendar, use current time
 if (isset($_GET['view_date'])) {
 	$view_date = strtotime($_GET['view_date']);
@@ -92,11 +82,20 @@ if (!isset($mysqli)) {
 	$mysqli = new mysqli($sql_host, $sql_user, $sql_pass, $sql_db);
 }
 
-if (isset($_SESSION['user']) && $_SESSION['user']['access_level'] === '0') {
-	$smarty->assign('cur', $_SERVER['PHP_SELF'].'?view_date='.$date);
+#access = array('read' => 1);
+if (isset($_SESSION['user'])) {
+	if ($_SESSION['user']['access_level'] === '0') {
+		$access['delete'] = 1;
+		$smarty->assign('cur', $_SERVER['PHP_SELF'].'?view_date='.$date);
+	}
+	if ($_SESSION['user']['operate_wilson_gate'] == true || $_SESSION['user']['operate_brigman_gate'] == true) {
+		$access['control'] = 1;
+	}
 }
 
-if (isset($live_camera_url)) {
+$smarty->assign('access', $access);
+
+if ($date == date('Ymd') && isset($live_camera_url)) {
 	$smarty->assign('live_cam', $live_camera_url);
 }
 
@@ -118,12 +117,15 @@ while ($result && $row = $result->fetch_assoc()) {
 		$camera_data[$row['time_stamp']]['movie'] = str_replace($base_path, '/media', $parts[0]);
 		$camera_data[$row['time_stamp']]['camera'] = $row['camera'];
 		$camera_data[$row['time_stamp']]['pretty_time'] = date('g:i:s a', strtotime($row['timefield']));
+		$camera_data[$row['time_stamp']]['refresh_id'] = $row['time_stamp'];
 		if (!isset($camera_data[$row['time_stamp']]['thumbnail'])) {
 			$camera_data[$row['time_stamp']]['thumbnail'] = "/media/static";
+			$camera_data[$row['time_stamp']]['refresh'] = 1;
 		}
 	} else if ($row['file_type'] == 1) {
 		// jpeg
 		$camera_data[$row['time_stamp']]['thumbnail'] = str_replace($base_path, '/media', $parts[0]);
+		unset($camera_data[$row['time_stamp']]['refresh']);
 	}
 }
 

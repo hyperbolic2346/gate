@@ -227,8 +227,8 @@ function loadHtml5LightBox(jsFolder) {
 			inst.options.isFirefox = (navigator.userAgent.match(/Firefox/i) != null);
 			inst.options.isOpera = (navigator.userAgent.match(/Opera/i) != null);
 			inst.options.isSafari = (navigator.userAgent.match(/Safari/i) != null);
-			inst.options.isIE9 = $.browser.msie && inst.options.html5VideoSupported;
-			inst.options.isIE678 = $.browser.msie && !inst.options.isIE9;	
+			inst.options.isIE9 = !(inst.options.isChrome || inst.options.isFirefox || inst.options.isOpera || inst.options.Safari) && inst.options.html5VideoSupported;
+			inst.options.isIE678 = false;;	
 			inst.options.isAndroid = (navigator.userAgent.match(/Android/i) != null);
 			inst.options.isIPad = (navigator.userAgent.match(/iPad/i) != null);
 			inst.options.isIPhone = ((navigator.userAgent.match(/iPod/i) != null) || (navigator.userAgent.match(/iPhone/i) != null));
