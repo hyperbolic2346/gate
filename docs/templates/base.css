@@ -8,7 +8,18 @@
 	margin-bottom: 25px;
 }
 
+#live_video_toggle_div {
+	display: block;
+}
+
+#live_video_toggle_button {
+        padding: 25px;
+	margin: 0px 15px;
+	width: 90%;
+}
+
 #live_video_div {
+	display: none;
 	width: 100%;
 }
 

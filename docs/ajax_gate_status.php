@@ -23,12 +23,16 @@ if ($wilson && $brigman) {
 
 // Create a new socket
 $sock = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
+socket_set_option($sock, SOL_SOCKET, SO_RCVTIMEO, array("sec"=>1, "usec"=>0));
 
 $arduino_ip = '10.0.1.25';
 $arduino_port = 8888;
 
-socket_sendto($sock, $request, strlen($request), 0, $arduino_ip, $arduino_port);
-socket_recvfrom($sock, $buf, 4096, 0, $ardiuno_ip, $arduino_port);
+if (!socket_sendto($sock, $request, strlen($request), 0, $arduino_ip, $arduino_port)) {
+	$buf = "{Unable to communicate with gate!}";
+} else {
+	socket_recvfrom($sock, $buf, 4096, 0, $ardiuno_ip, $arduino_port);
+}
 
 // Close
 socket_close($sock);

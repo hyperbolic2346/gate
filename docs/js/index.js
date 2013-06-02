@@ -1,12 +1,20 @@
 Last_cam_update = $.now();
+Refresh_time = 5000;
+Refresh_reset_count = 0;
 
 function clear_info() {
 	$('#info').html('&nbsp');
 }
 
+function update_quicker_for_a_while() {
+	Refresh_time = 1000;
+	Refresh_reset_count = 30;
+}
+
 function delete_entry(item, event_time) {
 	$(item).parent().remove();
 	$.post('/ajax_delete.php', { delete: event_time }, function (data) { $('#info').html(data).slideDown(); window.setTimeout(clear_info, 5000); });
+	update_quicker_for_a_while();
 }
 
 function release_gate() {
@@ -17,11 +25,13 @@ function release_gate() {
 function open_gate() {
 	$(this).attr("disabled", true);
 	$.get('ajax_change_gate.php', { open: true, id: $(this).attr("form") }, function (data) { $('#info').html(data).slideDown(); window.setTimeout(clear_info, 5000); update_gate_status(); });
+	update_quicker_for_a_while();
 }
 
 function hold_gate() {
 	$(this).attr("disabled", true);
 	$.get('ajax_change_gate.php', { hold: true, id: $(this).attr("form") }, function (data) { $('#info').html(data).slideDown(); window.setTimeout(clear_info, 5000); update_gate_status(); });
+	update_quicker_for_a_while();
 }
 
 function handle_gate_status_response($data) {
@@ -31,29 +41,38 @@ function handle_gate_status_response($data) {
 
 		if (gate_data.state == "MOVING") {
 			$status.append($('<div class="gate_state">').html("Currently Moving"));
-			$status.append($('<input type="button" value="Open Gate" disabled />'));
+			$status.append($('<button disabled>Open Gate</button>'));
 		} else if (gate_data.state == "CLOSED") {
 			$status.append($('<div class="gate_state">').html("Closed"));
-			$status.append($('<input type="button" value="Open Gate" />').attr("form", String(gate_num)).click(open_gate));
+			$status.append($('<button>Open Gate</button>').attr("form", String(gate_num)).click(open_gate));
 		} else if (gate_data.state == "OPEN") {
 			$status.append($('<div class="gate_state">').html("Open"));
-			$status.append($('<input type="button" value="Close Gate" disabled />'));
+			$status.append($('<button disabled>Close Gate</button>'));
 		} else {
 			$status.append($('<div class="gate_state">').html("Unknown!"));
 		}
 
-		$status.append($('<div class="gate_hold_state">').html(gate_data.hold_state));
-
 		if (gate_data.hold_state == "HELD BY US") {
-			$status.append($('<input type="button" value="Release Gate" />').attr("form", String(gate_num)).click(release_gate));
-		} else {
-			$status.append($('<input type="button" value="Hold Gate Open" />').attr("form", String(gate_num)).click(hold_gate));
+			$status.append($('<div class="gate_hold_state">').html("Held By Website"));
+			$status.append($('<button>Release Gate</button>').attr("form", String(gate_num)).click(release_gate));
+		} else if (gate_data.hold_state == "HELD BY REMOTE") {
+			$status.append($('<div class="gate_hold_state">').html("Held by Remote Control"));
+			$status.append($('<button>Hold Gate Open</button>').attr("form", String(gate_num)).click(hold_gate));
+		} else if (gate_data.hold_state == "NOT HELD") {
+			$status.append($('<div class="gate_hold_state">').html("Not Held"));
+			$status.append($('<button>Hold Gate Open</button>').attr("form", String(gate_num)).click(hold_gate));
 		}
 
 		$("#gate_control_div").append($status);
 		
 	});
-//	window.setTimeout(update_gate_status, 1000);
+	if (Refresh_reset_count > 0) {
+		Refresh_reset_count--;
+		if (Refresh_reset_count == 0) {
+			Refresh_time = 5000;
+		}
+	}
+//	window.setTimeout(update_gate_status, Refresh_time);
 }
 
 function update_gate_status() {
@@ -61,49 +80,36 @@ function update_gate_status() {
 }
 
 function expand() {
-	width = $(document).width();
-	height = $(window).height();
+	width = $(window).width() - 30;
+	height = $(window).height() - 30;
 
-	imgwidth = 640;
-	imgheight = 480;
-
-	if (width < 640 || height < 480) {
-		// something is not correct, resize to smallest dimension
-		diffw = 640 - width;
-		diffh = 480 - height;
-		if (diffw > diffh) {
-			imgwidth = width;
-			imgheight = (480 / 640) * width;
-			imgleft = 0;
-			imgtop = height/2 - imgheight/2;
-		} else {
-			imgheight = height;
-			imgwidth = (640 / 480) * height;
-			imgleft = width/2 - imgwidth/2;
-			imgtop = 0;
-		}
+	width_ratio = 4 / 3 * height;
+	if (width_ratio > width) {
+		// need to use width as limiting factor
+		height = 3 / 4 * width;
 	} else {
-		imgleft = width/2 - imgwidth/2;
-		imgtop = height/2 - imgheight/2;
+		width = width_ratio;
 	}
+
+	imgleft = $(window).width() / 2 - width / 2;
+	imgtop = $(window).height() / 2 - height / 2;;
 
 	$("#live_background").css({display:'block',height:'100%'}).click(function(e) { $("#live_video").unbind(e); collapse(); });
 
-	
-	$("#live_video").height(imgheight).width(imgwidth);
+	item = $("#live_video_img");
+	item.height(height).width(width);
 
-	$("#live_video").css({position:"absolute", left: imgleft, top: imgtop, "z-index":999});
-	$("#live_video").click(function(e) { $(this).unbind(e); collapse(); });
+	item.css({position:"absolute", left: imgleft, top: imgtop, "z-index":999});
+	item.click(function(e) { $(this).unbind(e); collapse(); });
 }
 
 function collapse() {
-	item = $("#live_video");
-	$("#live_video").height(120);
-	$("#live_video").width(160);
-	$("#live_video").css({position:"relative",left:"0px",top:"0px"});
+	item = $("#live_video_img");
+	size_live_feed();
+	item.css({position:"relative",left:"0px",top:"0px"});
 
 	$("#live_background").css({display:'none'}).unbind('click');
-	$("#live_video").click(function(e) { $(this).unbind(e); expand(); });
+	item.click(function(e) { $(this).unbind(e); expand(); });
 }
 
 function refresh_entries() {
@@ -136,19 +142,42 @@ function update_entries() {
 //	html5Lightbox.unbind('click').click(html5Lightbox.clickHandler);
 }
 
+function size_live_feed() {
+	if ($(window).width() > 480 && $(window).height() > 400) {
+		div_height = $(window).height() - 240;	// 240 for one row of thumbnails
+		div_width = 4 / 3 * div_height;
+		$("#live_video_div").css("width", div_width).css("height", div_height);
+		$("#live_video").css("width", div_width - 5).css("height", div_height - 5 - $("#live_label").outerHeight(true));
+		$("#live_video_img").css("width", div_width - 5).css("height", div_height - 5 - $("#live_label").outerHeight(true)); 
+//		$("#live_label).css("width", "100%");
+	}
+}
+
 $(function() {
 	if ($("#live_video_div").length > 0 ) {
+		if ($("#live_video_toggle_div").css('display') != 'none') { 
+			$("#live_video_toggle_div").append($('<input type="button" value="Show Live Feed" id="live_video_toggle_button" />'));
+		} else {
+			$("#live_video_img").attr('src', $("#live_video_img").data("feed"));
+		}
 		$("body").append('<div id="live_background" style="display:none;position:absolute;top:0px;left:0px;width:100%;height:100%;z-index:998;opacity:0.6;filter:alpha(opacity=60);background-color:#000000;"></div>');
-		$("#live_video").click(function(e) { $(this).unbind(e); expand(); });
+		$("#live_video_toggle_button").click(
+			function(e) {
+				$("#live_video_div").toggle();
+				if ($("#live_video_div").css('display') == 'none') { 
+					$("#live_video_toggle_button").html('Show Live Feed');
+					$("#live_video_img").attr('src', '');
+				} else { 
+					$("#live_video_toggle_button").html("Hide Live Feed");
+					$("#live_video_img").attr('src', $("#live_video_img").data("feed"));
+				}
+			});
+
+		$("#live_video_img").click(function(e) { $(this).unbind(e); expand(); });
 		//window.setInterval(update_entries, 60000);
 		//window.setInterval(refresh_entries, 5000);
 //		window.setTimeout(update_entries, 1000);
-		if ($(window).width() > 480) {
-			$("#live_video_div").css("width", "auto").css("height", $(window).height() - 240);
-//		$("#live_label).css("width", "100%");
-			$("#live_video").css("width", "auto").css("height", $(window).height() - 240 - 5 - $("#live_label").outerHeight(true));
-			$("#live_video_img").css("width", "auto").css("height", $(window).height() - 240 - 5 - $("#live_label").outerHeight(true)); 
-		}
+		size_live_feed();
 	}
 	update_gate_status();
 });

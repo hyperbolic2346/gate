@@ -13,9 +13,10 @@
 <div id='day'>{$day}</div>
 
 {if isset($live_cam)}
+<div id='live_video_toggle_div'></div>
 <div id='live_video_div'>
 	<div id='live_label'>Now</div>
-	<div id='live_video'><img id='live_video_img' src='{$live_cam}' /></div>
+	<div id='live_video'><img id='live_video_img' data-feed='{$live_cam}' /></div>
 </div>
 
 {if isset($access) && isset($access['control'])}
