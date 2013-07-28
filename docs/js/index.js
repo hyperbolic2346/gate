@@ -39,6 +39,11 @@ function handle_gate_status_response($data) {
 	$.each( $data, function( gate_num, gate_data) {
 		var $status = $('<div class="gate_status">').append($('<div class="gate_name">').html(gate_data.name));
 
+		// hackaroo!
+		if (gate_num == 0 && gate_data.state == "MOVING") {
+			gate_data.state = "CLOSED";
+		}
+
 		if (gate_data.state == "MOVING") {
 			$status.append($('<div class="gate_state">').html("Currently Moving"));
 			$status.append($('<button disabled>Open Gate</button>'));
@@ -72,7 +77,7 @@ function handle_gate_status_response($data) {
 			Refresh_time = 5000;
 		}
 	}
-//	window.setTimeout(update_gate_status, Refresh_time);
+	window.setTimeout(update_gate_status, Refresh_time);
 }
 
 function update_gate_status() {
