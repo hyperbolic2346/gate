@@ -31,6 +31,7 @@
 
 {if isset($live_cam) && isset($access['control'])}
 <br style="clear:both;"/>
+<div id='camera_events_toggle_div'></div>
 {/if}
 
 <div id='camera_events'>

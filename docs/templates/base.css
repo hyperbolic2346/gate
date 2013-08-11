@@ -31,6 +31,20 @@
 	width: 100%;
 }
 
+#camera_events_toggle_div {
+	display: block;
+}
+
+#camera_events_toggle_button {
+        padding: 25px;
+	margin: 0px 15px;
+	width: 90%;
+}
+
+#camera_events {
+	display: none;
+}
+
 .camera_event {
 	width: 100%;
 	float: left;

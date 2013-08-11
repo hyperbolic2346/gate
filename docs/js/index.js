@@ -162,27 +162,44 @@ $(function() {
 	if ($("#live_video_div").length > 0 ) {
 		if ($("#live_video_toggle_div").css('display') != 'none') { 
 			$("#live_video_toggle_div").append($('<input type="button" value="Show Live Feed" id="live_video_toggle_button" />'));
+			$("#live_video_toggle_button").click(
+				function(e) {
+					$("#live_video_div").toggle();
+					if ($("#live_video_div").css('display') == 'none') { 
+						$("#live_video_toggle_button").html('Show Live Feed');
+						$("#live_video_img").attr('src', '');
+					} else { 
+						$("#live_video_toggle_button").html("Hide Live Feed");
+						$("#live_video_img").attr('src', $("#live_video_img").data("feed"));
+					}
+				});
+
 		} else {
 			$("#live_video_img").attr('src', $("#live_video_img").data("feed"));
 		}
 		$("body").append('<div id="live_background" style="display:none;position:absolute;top:0px;left:0px;width:100%;height:100%;z-index:998;opacity:0.6;filter:alpha(opacity=60);background-color:#000000;"></div>');
-		$("#live_video_toggle_button").click(
-			function(e) {
-				$("#live_video_div").toggle();
-				if ($("#live_video_div").css('display') == 'none') { 
-					$("#live_video_toggle_button").html('Show Live Feed');
-					$("#live_video_img").attr('src', '');
-				} else { 
-					$("#live_video_toggle_button").html("Hide Live Feed");
-					$("#live_video_img").attr('src', $("#live_video_img").data("feed"));
-				}
-			});
-
 		$("#live_video_img").click(function(e) { $(this).unbind(e); expand(); });
 		//window.setInterval(update_entries, 60000);
 		//window.setInterval(refresh_entries, 5000);
 //		window.setTimeout(update_entries, 1000);
 		size_live_feed();
 	}
-	update_gate_status();
+	if ($("#camera_events_toggle_div").length && $("#camera_events_toggle_div").css('display') != 'none') { 
+		$("#camera_events_toggle_div").append($('<input type="button" value="Show Videos" id="camera_events_toggle_button" />'));
+		$("#camera_events_toggle_button").click(
+			function(e) {
+				$("#camera_events").toggle();
+				if ($("#camera_events").css('display') == 'none') { 
+					$("#camera_events_toggle_button").html('Show Videos');
+				} else { 
+					$("#camera_events_toggle_button").html("Hide Videos");
+				}
+			});
+	} else {
+		$("#camera_events").css({display:'block'});
+	}
+
+	if ($("#gate_control_div")) {
+		update_gate_status();
+	}
 });

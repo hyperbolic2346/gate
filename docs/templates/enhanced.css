@@ -53,6 +53,10 @@
 	float: left;
 }
 
+#camera_events_toggle_div {
+        display: none;
+}
+
 .camera_delete {
 	width: 25px;
 	height: 29px;
