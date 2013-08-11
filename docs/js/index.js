@@ -166,10 +166,10 @@ $(function() {
 				function(e) {
 					$("#live_video_div").toggle();
 					if ($("#live_video_div").css('display') == 'none') { 
-						$("#live_video_toggle_button").html('Show Live Feed');
+						$("#live_video_toggle_button").attr('value', 'Show Live Feed');
 						$("#live_video_img").attr('src', '');
 					} else { 
-						$("#live_video_toggle_button").html("Hide Live Feed");
+						$("#live_video_toggle_button").attr('value', 'Hide Live Feed');
 						$("#live_video_img").attr('src', $("#live_video_img").data("feed"));
 					}
 				});
@@ -190,9 +190,9 @@ $(function() {
 			function(e) {
 				$("#camera_events").toggle();
 				if ($("#camera_events").css('display') == 'none') { 
-					$("#camera_events_toggle_button").html('Show Videos');
+					$("#camera_events_toggle_button").attr('value', 'Show Videos');
 				} else { 
-					$("#camera_events_toggle_button").html("Hide Videos");
+					$("#camera_events_toggle_button").attr('value', 'Hide Videos');
 				}
 			});
 	} else {
