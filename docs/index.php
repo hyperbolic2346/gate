@@ -44,12 +44,15 @@ if (isset($_REQUEST['new_username']) && isset($_SESSION['user']) && $_SESSION['u
 	$smarty->assign('info', 'Added.');
 }
 
-if (isset($_REQUEST['delete']) && isset($_SESSION['user']) && $_SESSION['user']['access_level'] === '0') {
+// nuke "old" deleted videos
+{
 	if (!isset($mysqli)) {
 		$mysqli = new mysqli($sql_host, $sql_user, $sql_pass, $sql_db);
 	}
 
-	$query = 'SELECT filename, file_type FROM security WHERE event_time_stamp = "'.$_REQUEST['delete'].'"';
+	$delete_date = date('YmdHis', strtotime("-2 months"));
+
+	$query = 'SELECT filename, file_type FROM security WHERE deleted="1" AND event_time_stamp < '.$delete_date;
 	$result = $mysqli->query($query) or die("Unable to query database - $query");
 	while ($row = $result->fetch_assoc()) {
 		$ar = split_filename($row['filename']);
@@ -63,9 +66,9 @@ if (isset($_REQUEST['delete']) && isset($_SESSION['user']) && $_SESSION['user'][
 			unlink($ar[0].".thumb.jpg");
 		}
 	}
-	$query = 'DELETE FROM security WHERE event_time_stamp = "'.$_REQUEST['delete'].'"';
+
+	$query = 'DELETE FROM security WHERE deleted="1" AND event_time_stamp < '.$delete_date;
 	$result = $mysqli->query($query) or die("Unable to query database - $query");
-	$smarty->assign('info', 'Deleted.');
 }
 
 // if no day has been selected in the calendar, use current time
@@ -100,12 +103,22 @@ if ($date == date('Ymd') && isset($live_camera_url)) {
 	$smarty->assign('live_cam', $live_camera_url);
 }
 
-$query = 'SELECT TIME(event_time_stamp) as timefield, '. 
+if ($_REQUEST['show_deleted'] && isset($access['delete']) && $access['delete'] == 1) {
+	$query = 'SELECT TIME(event_time_stamp) as timefield, '. 
                 'event_time_stamp+0 as time_stamp, camera, filename, file_type '.
                 'FROM security '.
                 'WHERE event_time_stamp >= '.$date.'000000 '.
                 'AND event_time_stamp <= '.$date.'235959 '.
                 'ORDER BY timefield DESC, camera';
+} else {
+	$query = 'SELECT TIME(event_time_stamp) as timefield, '. 
+                'event_time_stamp+0 as time_stamp, camera, filename, file_type '.
+                'FROM security '.
+                'WHERE event_time_stamp >= '.$date.'000000 '.
+                'AND event_time_stamp <= '.$date.'235959 '.
+		'AND deleted = "0" '.
+                'ORDER BY timefield DESC, camera';
+}
 
 $result = $mysqli->query($query) or die("Unable to query database - $query");
 

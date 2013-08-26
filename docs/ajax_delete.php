@@ -19,6 +19,11 @@ if (!isset($_REQUEST['delete'])) {
 
 $mysqli = new mysqli($sql_host, $sql_user, $sql_pass, $sql_db);
 
+$query = 'UPDATE security SET deleted="1" WHERE event_time_stamp = "'.$_REQUEST['delete'].'"';
+$result = $mysqli->query($query) or die("Unable to query database - $query");
+echo "Deleted.";
+exit();
+
 $query = 'SELECT filename, file_type FROM security WHERE event_time_stamp = "'.$_REQUEST['delete'].'"';
 $result = $mysqli->query($query) or die("Unable to query database - $query");
 while ($row = $result->fetch_assoc()) {
