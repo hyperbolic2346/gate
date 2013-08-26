@@ -101,7 +101,7 @@ if ($date == date('Ymd') && isset($live_camera_url)) {
 }
 
 $query = 'SELECT TIME(event_time_stamp) as timefield, '. 
-                'event_time_stamp+0 as time_stamp, file_size, camera, filename, file_type '.
+                'event_time_stamp+0 as time_stamp, camera, filename, file_type '.
                 'FROM security '.
                 'WHERE event_time_stamp >= '.$date.'000000 '.
                 'AND event_time_stamp <= '.$date.'235959 '.

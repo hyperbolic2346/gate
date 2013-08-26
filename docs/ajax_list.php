@@ -31,13 +31,13 @@ if (isset($_SESSION['user']) && $_SESSION['user']['access_level'] === '0') {
 /*
 // get all events since the last update
 $query = 'SELECT TIME(event_time_stamp) as timefield, '.
-                'event_time_stamp+0 as time_stamp, file_size, camera, filename, file_type '.
+                'event_time_stamp+0 as time_stamp, camera, filename, file_type '.
                 'FROM security '.
                 'WHERE event_time_stamp >= '.date('YmdHis', $_REQUEST['last_update']/1000).' '.
                 'ORDER BY timefield DESC, camera';*/
 
 $query = 'SELECT TIME(event_time_stamp) as timefield, '.
-                'event_time_stamp+0 as time_stamp, file_size, camera, filename, file_type '.
+                'event_time_stamp+0 as time_stamp, camera, filename, file_type '.
                 'FROM security '.
                 'WHERE event_time_stamp >= '.date('Ymd', $_REQUEST['last_update']/1000).'000000 '.
                 'ORDER BY timefield DESC, camera';
