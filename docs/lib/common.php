@@ -1,4 +1,11 @@
 <?php
+define("EVENT_TYPE_LOGIN", 0);
+define("EVENT_TYPE_OPEN_WILSON_GATE", 1);
+define("EVENT_TYPE_HOLD_WILSON_GATE", 2);
+define("EVENT_TYPE_RELEASE_WILSON_GATE", 3);
+define("EVENT_TYPE_OPEN_BRIGMAN_GATE", 4);
+define("EVENT_TYPE_HOLD_BRIGMAN_GATE", 5);
+define("EVENT_TYPE_RELEASE_BRIGMAN_GATE", 6);
 
 function split_filename($filename)
 {
