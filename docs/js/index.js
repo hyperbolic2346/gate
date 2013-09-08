@@ -68,6 +68,10 @@ function handle_gate_status_response($data) {
 			$status.append($('<button>Hold Gate Open</button>').attr("form", String(gate_num)).click(hold_gate));
 		}
 
+		if (gate_data.info) {
+			$status.append($('<div class="gate_info">').html(gate_data.info));
+		}
+
 		$("#gate_control_div").append($status);
 		
 	});

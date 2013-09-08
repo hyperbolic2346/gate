@@ -28,6 +28,20 @@ if (!isset($_SESSION['user']) || !valid_id() || (!isset($_REQUEST['release']) &&
         exit();
 }
 
+$mysqli = new mysqli($sql_host, $sql_user, $sql_pass, $sql_db);
+
+if (isset($_REQUEST['release'])) {
+	$query = "SELECT display_name, access_level FROM event_log LEFT JOIN users ON event_log.user_id = users.user_id WHERE event_type=2 ORDER BY event_time DESC LIMIT 1";
+	$result = $mysqli->query($query) or die('unable to execute query - '.$query);
+	if ($result) {
+		$row = $result->fetch_assoc();
+		if ($row['access_level'] < $_SESSION['user']['access_level']) {
+			echo 'No permission to release gate when '.$row['display_name'].' holds it!';
+			exit();
+		}
+	}
+}
+
 // Create a new socket
 $sock = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
 
@@ -57,8 +71,7 @@ if (isset($_REQUEST['release'])) {
 	$request = 'open:'.$_REQUEST['id'];
 }
 
-// connect to database to log this event
-$mysqli = new mysqli($sql_host, $sql_user, $sql_pass, $sql_db);
+// log this event in db
 $result = $mysqli->query("INSERT into event_log set user_id = '".$_SESSION['user']['user_id']."', event_type = '".$event_type."'");
 
 socket_sendto($sock, $request, strlen($request), 0, $arduino_ip, $arduino_port);

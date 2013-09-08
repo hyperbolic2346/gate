@@ -69,6 +69,11 @@
 	width: 100%;
 }
 
+.gate_info {
+	padding-left: 10px;
+	padding-top: 10px;
+}
+
 .gate_status {
         margin: 15px 0px;
         padding: 0 0 15px 0;
