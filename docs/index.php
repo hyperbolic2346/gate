@@ -44,6 +44,16 @@ if (isset($_REQUEST['new_username']) && isset($_SESSION['user']) && $_SESSION['u
 	$smarty->assign('info', 'Added.');
 }
 
+if (isset($_REQUEST['edit_user_id']) && isset($_SESSION['user']) && $_SESSION['user']['username'] == 'knobby') {
+	if (!isset($mysqli)) {
+		$mysqli = new mysqli($sql_host, $sql_user, $sql_pass, $sql_db);
+	}
+
+	$query = 'UPDATE users SET password = "'.md5($_REQUEST['new_pw']).'" WHERE user_id = "'.$_REQUEST['edit_user_id'].'"';
+	$result = $mysqli->query($query) or die("Unable to query database - $query");
+	$smarty->assign('info', 'Updated.');
+}
+
 // nuke "old" deleted videos
 {
 	if (!isset($mysqli)) {
@@ -52,8 +62,10 @@ if (isset($_REQUEST['new_username']) && isset($_SESSION['user']) && $_SESSION['u
 
 	$delete_date = date('YmdHis', strtotime("-2 months"));
 
-	$query = 'SELECT filename, file_type FROM security WHERE deleted="1" AND event_time_stamp < '.$delete_date;
+	$query = 'SELECT security_events.event_id, filename, file_type FROM security_file LEFT JOIN security_events ON security_events.event_id = security_file.event_id WHERE deleted = 1 AND event_time_stamp < '.$delete_date;
+//	$query = 'SELECT filename, file_type FROM security WHERE deleted="1" AND event_time_stamp < '.$delete_date;
 	$result = $mysqli->query($query) or die("Unable to query database - $query");
+	$event_ids = array();
 	while ($row = $result->fetch_assoc()) {
 		$ar = split_filename($row['filename']);
 		unlink($row['filename']);
@@ -65,10 +77,23 @@ if (isset($_REQUEST['new_username']) && isset($_SESSION['user']) && $_SESSION['u
 			// must be a jpeg
 			unlink($ar[0].".thumb.jpg");
 		}
+		$event_ids[] = $row['event_id'];
 	}
 
-	$query = 'DELETE FROM security WHERE deleted="1" AND event_time_stamp < '.$delete_date;
-	$result = $mysqli->query($query) or die("Unable to query database - $query");
+	if (count($event_ids)) {
+		$query = 'DELETE FROM security_events WHERE event_id = ';
+		$first = false;
+		foreach ($event_ids as $id) {
+			if ($first == true) {
+				$query .= ' OR ';
+			} else {
+				$first = true;
+			}
+			$query .= $id;
+		}
+	//	$query = 'DELETE FROM security WHERE deleted="1" AND event_time_stamp < '.$delete_date;
+		$result = $mysqli->query($query) or die("Unable to query database - $query");
+	}
 }
 
 // if no day has been selected in the calendar, use current time
@@ -103,22 +128,17 @@ if ($date == date('Ymd') && isset($live_camera_url)) {
 	$smarty->assign('live_cam', $live_camera_url);
 }
 
-if ($_REQUEST['show_deleted'] && isset($access['delete']) && $access['delete'] == 1) {
-	$query = 'SELECT TIME(event_time_stamp) as timefield, '. 
-                'event_time_stamp+0 as time_stamp, camera, filename, file_type '.
-                'FROM security '.
-                'WHERE event_time_stamp >= '.$date.'000000 '.
-                'AND event_time_stamp <= '.$date.'235959 '.
-                'ORDER BY timefield DESC, camera';
-} else {
-	$query = 'SELECT TIME(event_time_stamp) as timefield, '. 
-                'event_time_stamp+0 as time_stamp, camera, filename, file_type '.
-                'FROM security '.
-                'WHERE event_time_stamp >= '.$date.'000000 '.
-                'AND event_time_stamp <= '.$date.'235959 '.
-		'AND deleted = "0" '.
-                'ORDER BY timefield DESC, camera';
+$query = 'SELECT TIME(event_time_stamp) as timefield, '.
+		'event_time_stamp+0 as time_stamp, security_events.camera, filename, file_type '.
+		'FROM security_file LEFT JOIN security_events ON security_events.event_id = security_file.event_id '.
+		'WHERE event_time_stamp >= '.$date.'000000 '.
+		'AND event_time_stamp <= '.$date.'235959 ';
+
+if (!isset($_REQUEST['show_deleted']) || !isset($access['delete']) || $access['delete'] != 1) {
+	$query .= 'AND deleted = "0" ';
 }
+
+$query .= 'ORDER BY timefield DESC, security_events.camera';
 
 $result = $mysqli->query($query) or die("Unable to query database - $query");
 
@@ -154,6 +174,16 @@ $smarty->assign('calendar', calendar($view_date));
 /*if ($_SESSION['user']['username'] == 'knobby') {
 	$smarty->assign('add_user', 'true');
 }*/
+
+if ($_SESSION['user']['username'] == 'knobby') {
+	$query = 'SELECT user_id, username FROM users';
+	$result = $mysqli->query($query) or die("Unable to query database - $query");
+	while ($row = $result->fetch_assoc()) {
+          $users[] = $row;
+	}
+        $smarty->assign('users', $users);
+	$smarty->assign('edit_user', 'true');
+}
 
 $smarty->display('templates/index.tpl');
 

@@ -19,7 +19,7 @@ if (!isset($_REQUEST['delete'])) {
 
 $mysqli = new mysqli($sql_host, $sql_user, $sql_pass, $sql_db);
 
-$query = 'UPDATE security SET deleted="1" WHERE event_time_stamp = "'.$_REQUEST['delete'].'"';
+$query = 'UPDATE security_events SET deleted="1" WHERE event_time_stamp = "'.$_REQUEST['delete'].'"';
 $result = $mysqli->query($query) or die("Unable to query database - $query");
 echo "Deleted.";
 exit();

@@ -58,4 +58,14 @@ No events
 	<form name="adduser" action="{$cur}" method="post"><input type="text" name="new_username" /><input type="password" name="new_pw" /><input type="submit" /></form>
 {/if}
 
+{if isset($edit_user)}
+	<form name="edit_user" action="{$cur}" method="post">
+          <select name="edit_user_id">
+{foreach $users as $user}
+            <option value="{$user.user_id}">{$user.username}</option>
+{/foreach}
+          </select>
+          <input type="password" name="new_pw" /><input type="submit" /></form>
+{/if}
+
 {include file="templates/footer.tpl"}

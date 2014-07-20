@@ -40,9 +40,9 @@ function handle_gate_status_response($data) {
 		var $status = $('<div class="gate_status">').append($('<div class="gate_name">').html(gate_data.name));
 
 		// hackaroo!
-		if (gate_num == 0 && gate_data.state == "MOVING") {
-			gate_data.state = "CLOSED";
-		}
+		//if (gate_num == 0 && gate_data.state == "MOVING") {
+		//	gate_data.state = "CLOSED";
+		//}
 
 		if (gate_data.state == "MOVING") {
 			$status.append($('<div class="gate_state">').html("Currently Moving"));
@@ -92,10 +92,10 @@ function expand() {
 	width = $(window).width() - 30;
 	height = $(window).height() - 30;
 
-	width_ratio = 4 / 3 * height;
+	width_ratio = 16 / 8 * height;
 	if (width_ratio > width) {
 		// need to use width as limiting factor
-		height = 3 / 4 * width;
+		height = 8 / 16 * width;
 	} else {
 		width = width_ratio;
 	}
@@ -154,7 +154,11 @@ function update_entries() {
 function size_live_feed() {
 	if ($(window).width() > 480 && $(window).height() > 400) {
 		div_height = $(window).height() - 240;	// 240 for one row of thumbnails
-		div_width = 4 / 3 * div_height;
+		div_width = 16 / 8 * div_height;
+		if (div_width > $(window).width() - 500) {
+			div_width = $(window).width() - 500;
+			div_height = 8 / 16 * div_width;
+		}
 		$("#live_video_div").css("width", div_width).css("height", div_height);
 		$("#live_video").css("width", div_width - 5).css("height", div_height - 5 - $("#live_label").outerHeight(true));
 		$("#live_video_img").css("width", div_width - 5).css("height", div_height - 5 - $("#live_label").outerHeight(true)); 

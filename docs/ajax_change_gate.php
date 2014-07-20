@@ -30,7 +30,7 @@ if (!isset($_SESSION['user']) || !valid_id() || (!isset($_REQUEST['release']) &&
 
 $mysqli = new mysqli($sql_host, $sql_user, $sql_pass, $sql_db);
 
-if (isset($_REQUEST['release'])) {
+if (isset($_REQUEST['id']) && $_REQUEST['id'] == 0 && isset($_REQUEST['release'])) {
 	$query = "SELECT display_name, access_level FROM event_log LEFT JOIN users ON event_log.user_id = users.user_id WHERE event_type=2 ORDER BY event_time DESC LIMIT 1";
 	$result = $mysqli->query($query) or die('unable to execute query - '.$query);
 	if ($result) {
