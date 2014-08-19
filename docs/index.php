@@ -1,5 +1,4 @@
 <?php
-
 // put full path to Smarty.class.php
 require(realpath(dirname(__FILE__).'/../lib/Smarty/Smarty.class.php'));
 include('config.inc');
@@ -14,6 +13,9 @@ $smarty->setConfigDir(realpath(dirname(__FILE__).'/../smarty/configs'));
 session_start();
 //unset($_SESSION['user']);
 $mysqli = NULL;
+
+//echo print_r($_REQUEST);
+//echo print_r($_POST, true);
 
 if (isset($_REQUEST['login_name'])) {
 	// connect to database
