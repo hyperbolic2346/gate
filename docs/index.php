@@ -11,11 +11,7 @@ $smarty->setCacheDir(realpath(dirname(__FILE__).'/../smarty/cache'));
 $smarty->setConfigDir(realpath(dirname(__FILE__).'/../smarty/configs'));
 
 session_start();
-//unset($_SESSION['user']);
 $mysqli = NULL;
-
-//echo print_r($_REQUEST);
-//echo print_r($_POST, true);
 
 if (isset($_REQUEST['login_name'])) {
 	// connect to database
@@ -56,7 +52,7 @@ if (isset($_REQUEST['edit_user_id']) && isset($_SESSION['user']) && $_SESSION['u
 	$smarty->assign('info', 'Updated.');
 }
 
-// nuke "old" deleted videos
+// nuke old deleted videos
 {
 	if (!isset($mysqli)) {
 		$mysqli = new mysqli($sql_host, $sql_user, $sql_pass, $sql_db);
@@ -65,7 +61,6 @@ if (isset($_REQUEST['edit_user_id']) && isset($_SESSION['user']) && $_SESSION['u
 	$delete_date = date('YmdHis', strtotime("-2 months"));
 
 	$query = 'SELECT security_events.event_id, filename, file_type FROM security_file LEFT JOIN security_events ON security_events.event_id = security_file.event_id WHERE deleted = 1 AND event_time_stamp < '.$delete_date;
-//	$query = 'SELECT filename, file_type FROM security WHERE deleted="1" AND event_time_stamp < '.$delete_date;
 	$result = $mysqli->query($query) or die("Unable to query database - $query");
 	$event_ids = array();
 	while ($row = $result->fetch_assoc()) {
@@ -93,7 +88,6 @@ if (isset($_REQUEST['edit_user_id']) && isset($_SESSION['user']) && $_SESSION['u
 			}
 			$query .= $id;
 		}
-	//	$query = 'DELETE FROM security WHERE deleted="1" AND event_time_stamp < '.$delete_date;
 		$result = $mysqli->query($query) or die("Unable to query database - $query");
 	}
 }
@@ -113,7 +107,6 @@ if (!isset($mysqli)) {
 	$mysqli = new mysqli($sql_host, $sql_user, $sql_pass, $sql_db);
 }
 
-#access = array('read' => 1);
 if (isset($_SESSION['user'])) {
 	if ($_SESSION['user']['access_level'] === '0') {
 		$access['delete'] = 1;
@@ -172,10 +165,6 @@ if (isset($camera_data)) {
 include('calendar.inc');
 
 $smarty->assign('calendar', calendar($view_date));
-
-/*if ($_SESSION['user']['username'] == 'knobby') {
-	$smarty->assign('add_user', 'true');
-}*/
 
 if ($_SESSION['user']['username'] == 'knobby') {
 	$query = 'SELECT user_id, username FROM users';
